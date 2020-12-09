@@ -1,0 +1,47 @@
+""
+{
+	"ServerList"
+	{
+		"Hosts"
+		{
+			"Realms"
+			{
+				"SteamGlobal"
+				{
+					"media4.steampowered.com"
+					{
+						"base_url"		"/client/"
+						"weight"		"100"
+						"https"		"0"
+					}
+					"media.st.dl.pinyuncloud.com"
+					{
+						"base_url"		"/client/"
+						"weight"		"1000"
+						"country_codes"		"CN"
+						"https"		"1"
+					}
+				}
+				"SteamChina"
+				{
+					"media.st.dl.pinyuncloud.com"
+					{
+						"base_url"		"/client/"
+						"weight"		"100"
+						"country_codes"		"CN"
+						"https"		"1"
+					}
+				}
+			}
+		}
+		"kvsign2"
+		{
+			"Hosts"		"6d50f624cd7ec028190cc137868b21b76b02e6b2517e3ff1e858a8229968238590a0a097f13610c22b58a3ee6c80a3e0141885f6bc584b673b80a948295b230e"
+		}
+	}
+	"ClientInfo"
+	{
+		"valid_until"		"1607128430"
+		"ip_country_code"		"PE"
+	}
+}
