@@ -16,7 +16,7 @@ public class GameFlowManager : MonoBehaviour
     [Header("Show score text ")]
     public TextMeshProUGUI textScore1;
     public TextMeshProUGUI textScore2;
-    public TextMeshProUGUI errorConnection;
+    public DisplayMessage errorConnection;
     public int score1 ;
     public int score2 ;
     public bool  StartGame;
@@ -77,7 +77,11 @@ public class GameFlowManager : MonoBehaviour
     float elapsedTimeBeforeEndScene = 0;
 
     [Header("Managing state of game")]
+    public Transform player1;
+    public Transform player2;
+
     public int gamePhase;
+
 
     [Header("DisplayMessage")]
     public DisplayMessage displayMessage;
@@ -88,6 +92,7 @@ public class GameFlowManager : MonoBehaviour
     public OrbController OC;
     public KartController[] kartsControllers;
     public DisplayScore[] kartsScore;
+    public Meta meta;
    
     void Start()
     {
@@ -96,6 +101,7 @@ public class GameFlowManager : MonoBehaviour
         //textScore2 = GameObject.Find("TextScore2").GetComponent<TextMeshProUGUI>();
         gamePhase = 0;
         isGameReady = false;
+        gameState = GameState.Play;
         StartGame = false;
 
         //if (playerKart == null) return;
@@ -120,6 +126,7 @@ public class GameFlowManager : MonoBehaviour
         winDisplayMessage.gameObject.SetActive(false);
         loseDisplayMessage.gameObject.SetActive(false);
         tieDisplayMessage.gameObject.SetActive(false);
+        errorConnection.gameObject.SetActive(false);
         m_TimeManager.StopRace();
         //run race countdown animation
     }
@@ -149,13 +156,13 @@ public class GameFlowManager : MonoBehaviour
 
         kartsControllers = FindObjectsOfType<KartController>();
         
-        foreach (KartController kart in kartsControllers)
-        {
+        //foreach (KartController kart in kartsControllers)
+        //{
 
-            TC.SelectTracks();
-            OC.CreateOrbs();   
-            break;
-        }
+        TC.SelectTracks();
+        OC.CreateOrbs();   
+        //    break;
+        //}
     }
 
     IEnumerator CountdownThenStartRaceRoutine()
@@ -189,22 +196,6 @@ public class GameFlowManager : MonoBehaviour
             yield return new WaitForSecondsRealtime(1f);
         }
     }
-
-
-    /*
-    Tutorial:
-    - Añadir scripts: 4 (tutorial) trakcTutorial, orbTutorial, Tutorial Controller, 
-    - Modifique ArcadeKart, prevencion de errores
-    - Añadi una escena 
-    - Modifique el introMenu
-    
-    Estados de descnexion y ganar:
-        -Agregue un script show score
-        -Agregue una scena tie
-        -Modifique scenas Win
-        -Modifique scenas Lost
-        -Modifique todo el gameflowmanager        
-    */
 
 
     void Update()
@@ -245,7 +236,7 @@ public class GameFlowManager : MonoBehaviour
                 isGameReady = true;
                 StartGame = true;
                 gameState = GameState.Play;
-                Invoke("GameReady",0.2f);
+                GameReady();
             }
 
             kartsScore = FindObjectsOfType<DisplayScore>();
@@ -254,57 +245,89 @@ public class GameFlowManager : MonoBehaviour
                 if(_score.gameObject.GetComponent<KartController>().playerID == 1){
                     textScore1.text = (_score.myScore).ToString();
                     score1 = _score.myScore;
-                }else{
+                } else {
                     textScore2.text = (_score.myScore).ToString();
                     score2 = _score.myScore;
                 }
             }
- 
-            if (m_ObjectiveManager.AreAllObjectivesCompleted())
+
+            if (gamePhase == 1)
             {
-                print("*ESTATE 0*");
-                gameState = GameState.State2;
-                EndGame(); // 0 == nextPartOfGame 
+                UpdatePhaseOne();
             }
-                 
+            
+
+            //if (m_ObjectiveManager.AreAllObjectivesCompleted())
+            //{
+            //    print("*ESTATE 0*");
+            //    gameState = GameState.State2;
+            //    EndGame(); // 0 == nextPartOfGame 
+            //}
 
             if (m_TimeManager.IsFinite && m_TimeManager.IsOver)
             {
-                print("*ESTATE 1*");
+                //print("*ESTATE 1*");
                 gameState = GameState.Lost;
                 EndGame();
             }
                 
-
+            // player disconnect
             if (karts.Length == 1 && isGameReady && StartGame)
             {
-                //isGameReady = false;
-                
-                if (score1 == score2)
-                {
-                    print("*ESTATE 3*");
-                    gameState = GameState.Tie;
-                }
-                else if(score1 > score2) 
-                {
-                    print("*ESTATE 4*");
-                    gameState = GameState.Won;
-                }
-                else
-                {
-                    print("*ESTATE 5*");
-                    gameState = GameState.Lost;
-                }
-                EndGame();
+                errorConnection.gameObject.SetActive(true);
+                checkWinner();
             }
         }
     }
 
-    void EnterCompetitive()
+    void UpdatePhaseOne()
     {
-        //gamePhase == 1;
-        displayMessage.message = "Compete against the other player to win!";
+        if (meta.value) checkWinner();
     }
+
+    void checkWinner()
+    {
+        if (score1 == score2)
+            gameState = GameState.Tie;
+
+        if (karts[0].GetComponent<KartController>().SetWinner(score1, score2))
+            gameState = GameState.Won;
+        else
+            gameState = GameState.Lost;
+        EndGame();
+    }
+
+    void DeactiveMessage()
+    {
+        displayMessage.gameObject.SetActive(false);
+    }
+
+    public void StartCompetition()
+    {
+        gamePhase = 1;
+        displayMessage.message = "Compete against the other player to win!";
+        displayMessage.gameObject.SetActive(true);
+        displayMessage.Display();
+        Invoke("DeactiveMessage", 2f);
+        /// move player pos
+        player1.position = new Vector3(0f, 0f, 0f);
+        player2.position = new Vector3(0f, 0f, 0f);
+        /// make them not able to move
+        foreach (ArcadeKart k in karts)
+        {
+            k.SetCanMove(false);
+        }
+        /// Reset time and start countdown
+        m_TimeManager.TotalTime = 120;
+        ShowRaceCountdownAnimation(); // show canvas
+
+        StartCoroutine(CountdownThenStartRaceRoutine()); // show countdown
+
+        /// Create a finish line for each player
+        meta.gameObject.SetActive(true);
+    }
+
+
 
     //void EndGame(bool win)
     void EndGame()
@@ -334,7 +357,7 @@ public class GameFlowManager : MonoBehaviour
         if(gameState == GameState.State2 ){
             m_TimeLoadEndGameScene = Time.time + endSceneLoadDelay + delayBeforeFadeToBlack;
             
-            m_SceneToLoad = state2SceneName;
+            //m_SceneToLoad = state2SceneName;
         }
         else if(gameState == GameState.Tie)
         {

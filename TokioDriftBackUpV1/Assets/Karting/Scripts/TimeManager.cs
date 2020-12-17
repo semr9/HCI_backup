@@ -6,7 +6,7 @@ using UnityEngine;
 public class TimeManager : MonoBehaviour
 { 
     public bool IsFinite { get; private set; }
-    public float TotalTime { get; private set; }
+    public float TotalTime { get; set; }
     public float TimeRemaining { get; private set; }
     public bool IsOver { get; private set; }
 

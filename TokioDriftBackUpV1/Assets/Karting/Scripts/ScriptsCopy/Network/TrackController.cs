@@ -5,59 +5,48 @@ using Mirror;
 using System;
 
 public class TrackController : MonoBehaviour
-{
-    //Some references
-    // [Header("Reference of comuncication")]
-    // [SerializeField] private Track instanceOfCE= null;
-    
-    
+{    
     [Header("OrbController")]
     public OrbController orbController;
 
     [Header("Tracks")]
     public Track[] tracks;
-    //public int randomNumber = 0;
 
-    // Start is called before the first frame update
-    void Start()
+    [Header("Change to Competitive")]
+    public bool IsInCompetitive = false;
+    public GameFlowManager manager;
+    public AudioClip SuccessSound;
+
+    public void Update()
     {
-        //tracksDestroyed = new bool[10];
+        if(IsInCompetitive)
+        {
+            bool allRepaired = true;
+            foreach(Track track in tracks)
+            {
+                if(!track.isRepaired)
+                {
+                    allRepaired = false;
+                    break;
+                }
+            }
+            if(allRepaired)
+            {
+                IsInCompetitive = true;
+                manager.StartCompetition();
+                if (SuccessSound)
+                    AudioUtility.CreateSFX(SuccessSound, transform.position, AudioUtility.AudioGroups.Collision, 0f);
+            }
+        }
     }
 
     // public void SelectTracks(int randomNumber)
     public void SelectTracks()
     {
-        
-        int randomTrack/* = Random.Range(0, 10)*/;
-        //tracks = new Track[10];
-        //Track[] AllTracks;
-        //tracks = FindObjectsOfType<Track>();
-        //tracks = new Track[10];
-        // int[] tracksSelected = new int[10]; // index of tracks selected
-        // int tracksSelectedIndex = 0; 
+        int randomTrack;
         for (int index = 0; index < 10; ++index) {
-            //if (index > AllTracks.Length) break;
-            //if (randomNumber == 10) randomNumber = 0;
-            // randomTrack = UnityEngine.Random.Range(0, AllTracks.Length); /// elegir un track al azar
-            
-            /// check if track has already been selected
-            // for(int i = 0; i < tracksSelectedIndex; ++i )
-            // {
-            //     if(randomTrack == tracksSelected[i])
-            //     {
-            //         randomTrack = UnityEngine.Random.Range(0, AllTracks.Length);
-            //         i = 0;
-            //     }
-            // }
-            /// asign track
-            // tracksSelected[tracksSelectedIndex++] = randomTrack;
-            //tracks[index] = AllTracks[index].GetComponent<Track>();
-            // tracks[index].TrackNumber = randomNumber;
-            // tracks[index].identification = randomNumber;
             tracks[index].TrackNumber = index;
             tracks[index].identification = index;
-
-            // randomNumber++;
         }
 
         Invoke("ExplodeTracks", 3f);

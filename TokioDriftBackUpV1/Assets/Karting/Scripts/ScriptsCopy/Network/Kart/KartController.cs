@@ -109,6 +109,14 @@ public class KartController : NetworkBehaviour
     }
     #endregion
 
+    public bool SetWinner(int score1,int score2)
+    {
+        bool winner = score1 > score2;
+        if (winner && playerID == 1)
+            return true;
+        else
+            return false;
+    }
 
     [Client]
     void Update()
