@@ -25,6 +25,7 @@ namespace KartGame.KartSystems
 
 		void Start()
 		{
+			print("INCIALIZACION DE UN CARRO");
 			port = 5065; //1 
 			ejex = 0.0;
 			InitUDP(); //4
@@ -65,14 +66,14 @@ namespace KartGame.KartSystems
 					byte[] data = client.Receive(ref anyIP); //4
 
 					string text = Encoding.UTF8.GetString(data); //5
-					print(">> " + text);
+					//print(">> " + text);
 					if(text == "not"){
 						angulo = -1;					
 					}else{
 						angulo = int.Parse(text);
 					}
 					
-					
+					//print(">> " + angulo);
 					if(angulo != -1)
 					{
 						if(angulo > 85 && angulo < 95){
@@ -103,7 +104,7 @@ namespace KartGame.KartSystems
 						StateDetect = false;
 					}	
 					
-						
+					print(">> " + ejex);	
 					/*if (String.Equals(text, "straight"))
 					{
 						ejex = 0;
@@ -153,8 +154,11 @@ namespace KartGame.KartSystems
 		public float calculateX(){
 		
 			if(stateWheel==1){
+				print("EJE-TIMON");
+				print((float)ejex);
 				return 	(float)ejex;
 			}else{
+				print("EJE-HORIZONTAL");
 				return Input.GetAxis(Horizontal);
 			}
 		}

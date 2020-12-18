@@ -202,7 +202,7 @@ public class GameFlowManager : MonoBehaviour
     {
         if (gameState != GameState.Play )
         {
-            print("************PRIMERO**********************");
+            //print("************PRIMERO**********************");
             elapsedTimeBeforeEndScene += Time.deltaTime;
             if (elapsedTimeBeforeEndScene >= endSceneLoadDelay && StartGame )//&& StartGame
             {
@@ -217,7 +217,7 @@ public class GameFlowManager : MonoBehaviour
                 // See if it's time to load the end scene (after the delay)
                 if (Time.time >= m_TimeLoadEndGameScene )
                 {
-                    print("**************REALLY HERE************************");
+                    //print("**************REALLY HERE************************");
                     PlayerPrefs.SetInt("Score1", score1);
                     PlayerPrefs.SetInt("Score2", score2);
                     PlayerPrefs.Save();
@@ -228,11 +228,11 @@ public class GameFlowManager : MonoBehaviour
         }
         else
         {
-            print("************SEGUNDO**********************");
+            //print("************SEGUNDO**********************");
             karts = FindObjectsOfType<ArcadeKart>();
             if (karts.Length == 2 && !isGameReady )
             {
-                print("////////////////////////////////////////////////////////////////////////////////////");
+                //print("////////////////////////////////////////////////////////////////////////////////////");
                 isGameReady = true;
                 StartGame = true;
                 gameState = GameState.Play;
@@ -266,7 +266,7 @@ public class GameFlowManager : MonoBehaviour
 
             if (m_TimeManager.IsFinite && m_TimeManager.IsOver)
             {
-                print("*ESTATE 1*");
+                //print("*ESTATE 1*");
                 gameState = GameState.Lost;
                 EndGame();
             }
@@ -309,10 +309,10 @@ public class GameFlowManager : MonoBehaviour
             EndGame();
             return;
         }
-        print("A");
-        print(score1);
-        print("B");
-        print(score2);
+        //print("A");
+        //print(score1);
+        //print("B");
+        //print(score2);
         textScore1.text = (score1).ToString();
         textScore2.text = (score2).ToString();
         int i = 0;

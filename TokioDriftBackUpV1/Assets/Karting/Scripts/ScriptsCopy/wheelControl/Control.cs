@@ -31,7 +31,7 @@ public class Control : MonoBehaviour
         stateChange = false;
         state = 0;
         cont = 0;
-        size = 50000000;
+        size = 50000;
     }
 
     // Update is called once per frame
