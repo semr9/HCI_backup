@@ -120,7 +120,6 @@ public class GameFlowManager : MonoBehaviour
 
         m_TimeManager = FindObjectOfType<TimeManager>();
         DebugUtility.HandleErrorIfNullFindObject<TimeManager, GameFlowManager>(m_TimeManager, this);
-
         AudioUtility.SetMasterVolume(1);
 
         winDisplayMessage.gameObject.SetActive(false);
@@ -128,7 +127,6 @@ public class GameFlowManager : MonoBehaviour
         tieDisplayMessage.gameObject.SetActive(false);
         errorConnection.gameObject.SetActive(false);
         m_TimeManager.StopRace();
-        //run race countdown animation
     }
 
     public void subGameReady()
@@ -147,6 +145,7 @@ public class GameFlowManager : MonoBehaviour
 
     public void GameReady()
     {
+        m_TimeManager.SetTime(300, true);
         //karts = FindObjectsOfType<ArcadeKart>();
 
         ShowRaceCountdownAnimation();
@@ -171,6 +170,7 @@ public class GameFlowManager : MonoBehaviour
         StartRace();
     }
 
+    
     void StartRace()
     {
         foreach (ArcadeKart k in karts)
@@ -266,7 +266,7 @@ public class GameFlowManager : MonoBehaviour
 
             if (m_TimeManager.IsFinite && m_TimeManager.IsOver)
             {
-                //print("*ESTATE 1*");
+                print("*ESTATE 1*");
                 gameState = GameState.Lost;
                 EndGame();
             }
@@ -282,49 +282,102 @@ public class GameFlowManager : MonoBehaviour
 
     void UpdatePhaseOne()
     {
-        if (meta.value) checkWinner();
+        if (meta.value){
+            displayMessage.message = "A player has reached the finish Line!";
+            StartCoroutine(ShowObjectivesRoutine());
+            //checkWinner();
+        } 
     }
 
-    void checkWinner()
+    public void checkWinner()
     {
-        if (score1 == score2)
+        
+        kartsScore = FindObjectsOfType<DisplayScore>();
+        //foreach (DisplayScore _score in kartsScore)
+        //{
+        //    if(_score.gameObject.GetComponent<KartController>().playerID == 1){
+        //        textScore1.text = (_score.myScore).ToString();
+        //        score1 = _score.myScore;
+        //    } else {
+        //        textScore2.text = (_score.myScore).ToString();
+        //        score2 = _score.myScore;
+        //    }
+        //}
+        
+        if (score1 == score2){
             gameState = GameState.Tie;
+            EndGame();
+            return;
+        }
+        print("A");
+        print(score1);
+        print("B");
+        print(score2);
+        textScore1.text = (score1).ToString();
+        textScore2.text = (score2).ToString();
+        int i = 0;
+        kartsControllers = FindObjectsOfType<KartController>();
+        foreach(ArcadeKart kart in karts)
+        {
+            if(kart.isLocalPlayer)
+            {
+                if (kartsControllers[i].SetWinner(score1, score2))
+                    gameState = GameState.Won;
+                else
+                    gameState = GameState.Lost;
+            }
+            i++;
+        }
 
-        if (karts[0].GetComponent<KartController>().SetWinner(score1, score2))
-            gameState = GameState.Won;
-        else
-            gameState = GameState.Lost;
         EndGame();
     }
 
-    void DeactiveMessage()
+    public void cheatCompetition()
     {
-        displayMessage.gameObject.SetActive(false);
+        Track[] tracks = FindObjectsOfType<Track>();
+        foreach(Track track in tracks)
+        {
+            track.isRepaired = true;
+        }
+    }
+
+    public void ShowNewObjective()
+    {
+        displayMessage.message = "Compete against the other player to win!";
+        StartCoroutine(ShowObjectivesRoutine());
+        /// Reset time and start countdown
+        m_TimeManager.StopRace();
+        m_TimeManager.SetTime(120, true);
+        //m_TimeManager.TotalTime = 120;
+        Invoke("StartRace", 3f);
+        ShowRaceCountdownAnimation(); // show canvas
+
+        StartCoroutine(CountdownThenStartRaceRoutine()); // show countdown
+        meta.gameObject.SetActive(true);
     }
 
     public void StartCompetition()
     {
+        //karts = FindObjectsOfType<ArcadeKart>();
+        //print("FUNCION STADO 2");
         gamePhase = 1;
-        displayMessage.message = "Compete against the other player to win!";
-        displayMessage.gameObject.SetActive(true);
-        displayMessage.Display();
-        Invoke("DeactiveMessage", 2f);
+        displayMessage.message = "All the tracks has been repaired!";
+        StartCoroutine(ShowObjectivesRoutine());
         /// move player pos
-        player1.position = new Vector3(0f, 0f, 0f);
-        player2.position = new Vector3(0f, 0f, 0f);
+        karts[0].transform.position = new Vector3(26.85f, 1f, 47f);
+        karts[0].transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        karts[1].transform.position = new Vector3(22.5f, 1f, 47f);
+        karts[1].transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        karts[0].Rigidbody.velocity = new Vector3(0f, 0f, 0f);
+        karts[1].Rigidbody.velocity = new Vector3(0f, 0f, 0f);
+
         /// make them not able to move
         foreach (ArcadeKart k in karts)
         {
             k.SetCanMove(false);
         }
-        /// Reset time and start countdown
-        m_TimeManager.TotalTime = 120;
-        ShowRaceCountdownAnimation(); // show canvas
-
-        StartCoroutine(CountdownThenStartRaceRoutine()); // show countdown
-
+        Invoke("ShowNewObjective", 3f);
         /// Create a finish line for each player
-        meta.gameObject.SetActive(true);
     }
 
 

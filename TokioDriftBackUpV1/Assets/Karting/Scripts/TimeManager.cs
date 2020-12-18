@@ -13,7 +13,7 @@ public class TimeManager : MonoBehaviour
     private bool raceStarted;
 
     public static Action<float> OnAdjustTime;
-    public static Action<int, bool, GameMode> OnSetTime;
+    public static Action<int, bool> OnSetTime;
 
     private void Awake()
     {
@@ -39,9 +39,9 @@ public class TimeManager : MonoBehaviour
         TimeRemaining += delta;
     }
 
-    private void SetTime(int time, bool isFinite, GameMode gameMode)
+    public void SetTime(int time, bool isFinite)
     {
-        TotalTime = 180;
+        TotalTime = time;
         IsFinite = isFinite;
         TimeRemaining = TotalTime;
     }

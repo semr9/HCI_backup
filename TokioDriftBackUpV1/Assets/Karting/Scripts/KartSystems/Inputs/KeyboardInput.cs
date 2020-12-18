@@ -99,7 +99,7 @@ namespace KartGame.KartSystems
 						}
 					
 					}else{
-						ejex = 0;
+						ejex = 0.0;
 						StateDetect = false;
 					}	
 					

@@ -16,22 +16,24 @@ public class TrackController : MonoBehaviour
     public bool IsInCompetitive = false;
     public GameFlowManager manager;
     public AudioClip SuccessSound;
-
+    public int numberOfTrackRepaired = 0;
     public void Update()
     {
-        if(IsInCompetitive)
+        if(!IsInCompetitive)
         {
-            bool allRepaired = true;
-            foreach(Track track in tracks)
+            // bool allRepaired = true;
+            // foreach(Track track in tracks)
+            // {
+            // if(numberOfTrackRepaired == 10)
+            // {
+            //     print(track.TrackNumber);
+            //     allRepaired = false;
+            //     break;
+            // }
+            // }
+            if(numberOfTrackRepaired == 10 )
             {
-                if(!track.isRepaired)
-                {
-                    allRepaired = false;
-                    break;
-                }
-            }
-            if(allRepaired)
-            {
+                print("allRepaired");
                 IsInCompetitive = true;
                 manager.StartCompetition();
                 if (SuccessSound)

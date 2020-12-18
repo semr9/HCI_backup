@@ -71,11 +71,13 @@ public class ComunicationStates : NetworkBehaviour
             // print("xxxxxxxxxxxxxxxxxxxxxxx");
             if (track != null && track.identification == iden)
             {
+                TC.numberOfTrackRepaired++;
                 print("Number of Track");
                 print(iden);
                 print("******************");
                 track.TrackRepaired();
                 track.isReady = true;
+                track.isRepaired = true;
                 if(playerID == 1)
                 {
                     string str = objective1.text;
