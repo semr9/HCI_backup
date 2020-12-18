@@ -90,7 +90,8 @@ public class KartController : NetworkBehaviour
         
         /// Kart
         arcadeKart = this.GetComponent<ArcadeKart>();
-        GameObject.Find("controlWheel").GetComponent<ControlWheel>().Car = arcadeKart.gameObject;
+        if (isLocalPlayer) GameObject.Find("controlWheel").GetComponent<ControlWheel>().Car = arcadeKart.gameObject;
+        //GameObject.Find("controlWheel").GetComponent<ControlWheel>().Car = arcadeKart.gameObject;
         arcadeKart.isLocalPlayer = true;
         arcadeKart.playerID = playerID;
         //arcadeKart.isHost = true;
